@@ -4,7 +4,7 @@ This code calculates the minimum difference you can achieve by removing elements
 
 Here's a step-by-step explanation with code snippets in each language:
 
-## 1. Define the Function and Input:
+## 1. Define the Function and Input
 
 Each code snippet defines a function named `minDifference` that takes an integer array `nums` as input.
 
@@ -54,7 +54,7 @@ func minDifference(nums []int) int {
 }
 ```
 
-## 2. Check for Base Case:
+## 2. Check for Base Case
 
 The code first checks if the array size (`n`) is less than or equal to 4. If so, the minimum difference is 0 (removing elements from such a small array won't make a difference), and the function returns 0.
 
@@ -96,7 +96,7 @@ if n <= 4 {
 }
 ```
 
-## 3. Sort the Array:
+## 3. Sort the Array
 
 The code then sorts the input array `nums` in ascending order. Sorting is necessary to efficiently calculate the minimum difference later.
 
@@ -130,7 +130,7 @@ nums.sort()
 sort.Ints(nums)
 ```
 
-## 4. Calculate and Return Minimum Difference:
+## 4. Calculate and Return Minimum Difference
 
 The core logic involves calculating the minimum difference achievable by removing elements from the sorted array. The code considers four scenarios:
 
