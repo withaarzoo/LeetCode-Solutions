@@ -124,3 +124,13 @@ We welcome contributions to improve and expand our repository of LeetCode soluti
 6. **Submit** a Pull Request, providing a brief description of your changes.
 
 Thank you for helping us make these solutions accessible and valuable to the community!
+
+## Connect with Me
+
+Stay connected and get updates on the latest solutions, explanations, and coding tips:
+
+- 📸 **Instagram**: [Follow me for daily coding content](https://instagram.com/withaarzoo)  
+- ▶️ **YouTube**: [Watch tutorials & problem walkthroughs](https://www.youtube.com/@codewithaarzoo?sub_confirmation=1)  
+- 💬 **Telegram Group**: [Join our coding community](https://t.me/codewithaarzoo)  
+
+Follow along for **daily coding content, tips, and problem-solving strategies** 🚀
