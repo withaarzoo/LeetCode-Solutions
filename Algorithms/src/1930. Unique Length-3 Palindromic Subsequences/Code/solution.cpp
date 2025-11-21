@@ -1,36 +1,38 @@
+#include <bits/stdc++.h>
+using namespace std;
+
 class Solution
 {
 public:
     int countPalindromicSubsequence(string s)
     {
-        vector<int> first(26, -1), last(26, -1);
         int n = s.size();
-
-        // Record first and last occurrences
-        for (int i = 0; i < n; i++)
+        const int A = 26;
+        vector<int> first(A, INT_MAX), last(A, -1);
+        // record first and last occurrence for every letter
+        for (int i = 0; i < n; ++i)
         {
-            int index = s[i] - 'a';
-            if (first[index] == -1)
-                first[index] = i;
-            last[index] = i;
+            int c = s[i] - 'a';
+            first[c] = min(first[c], i);
+            last[c] = max(last[c], i);
         }
 
-        int result = 0;
-
-        // Count unique middle characters for each letter
-        for (int i = 0; i < 26; i++)
+        int ans = 0;
+        // for each outer letter, count distinct middle letters between first and last
+        for (int c = 0; c < A; ++c)
         {
-            if (first[i] != -1 && last[i] > first[i])
+            if (first[c] < last[c])
             {
-                unordered_set<char> middleChars;
-                for (int j = first[i] + 1; j < last[i]; j++)
+                vector<bool> seen(A, false);
+                for (int i = first[c] + 1; i < last[c]; ++i)
                 {
-                    middleChars.insert(s[j]);
+                    seen[s[i] - 'a'] = true;
                 }
-                result += middleChars.size();
+                for (int j = 0; j < A; ++j)
+                    if (seen[j])
+                        ++ans;
             }
         }
-
-        return result;
+        return ans;
     }
 };

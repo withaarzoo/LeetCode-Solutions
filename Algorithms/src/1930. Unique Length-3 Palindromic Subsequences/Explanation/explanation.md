@@ -1,136 +1,404 @@
-# Count Palindromic Subsequences (Length 3)  
+# Unique Length-3 Palindromic Subsequences (LeetCode 1930)
 
-This repository provides a solution to the problem of counting unique length-3 palindromic subsequences (`a _ a`) in a string. The explanation is broken down step-by-step for each language: **C++**, **Java**, **JavaScript**, **Python**, and **Go**.
+![Problem Screenshot](/mnt/data/31a07173-a7ec-4f65-a16b-bd9348221068.png)
 
----
+## Table of Contents
 
-## Problem Statement  
+* [Problem Summary](#problem-summary)
+* [Constraints](#constraints)
+* [Intuition](#intuition)
+* [Approach](#approach)
+* [Data Structures Used](#data-structures-used)
+* [Operations & Behavior Summary](#operations--behavior-summary)
+* [Complexity](#complexity)
+* [Multi-language Solutions](#multi-language-solutions)
 
-Given a string `s`, find the number of unique palindromic subsequences of length 3 in the form `a _ a`, where the first and last characters are the same, and the middle character can be any character.
-
----
-
-## Approach  
-
-The solution involves:
-
-1. **Tracking first and last occurrences** of each character in the string.
-2. **Finding unique middle characters** between the first and last occurrences for every character.
-3. **Counting distinct palindromes** based on unique middle characters.
-
----
-
-## Step-by-Step Explanation for Each Language  
-
-### C++ Code  
-
-1. **Initialize First and Last Occurrence Arrays**:  
-   - Use an array of size 26 (for all lowercase letters) to store the first and last occurrence of each character in the string.
-   - Iterate over the string to populate these arrays.
-
-2. **Identify Characters with Multiple Occurrences**:  
-   - For each character, check if its first occurrence is not `-1` and if its last occurrence is after its first occurrence.
-
-3. **Collect Unique Middle Characters**:  
-   - For the characters identified in step 2, iterate over the range between the first and last occurrences.
-   - Use a `set` to store unique characters in this range.
-
-4. **Count Unique Palindromes**:  
-   - Add the size of the `set` (number of unique middle characters) to the result for each character.
+  * [C++](#c)
+  * [Java](#java)
+  * [JavaScript](#javascript)
+  * [Python3](#python3)
+  * [Go](#go)
+* [Step-by-step Detailed Explanation (C++, Java, JavaScript, Python3, Go)](#step-by-step-detailed-explanation-c-java-javascript-python3-go)
+* [Examples](#examples)
+* [How to use / Run locally](#how-to-use--run-locally)
+* [Notes & Optimizations](#notes--optimizations)
+* [Author](#author)
 
 ---
 
-### Java Code  
+## Problem Summary
 
-1. **Set Up Arrays for First and Last Occurrences**:  
-   - Use two arrays of size 26 to track the first and last indices of each character. Initialize the `first` array with `-1` to indicate unvisited characters.
+Given a string `s`, return the **number of unique palindromes of length 3** that are subsequences of `s`.
 
-2. **Populate the Arrays**:  
-   - Traverse the string and update the `first` and `last` occurrence of each character.
+A length-3 palindrome must have the form `a b a` (same character at both ends, any character in the middle). The same palindrome string is counted once even if it can be formed multiple ways.
 
-3. **Check for Eligible Characters**:  
-   - For each letter of the alphabet, verify if it appears more than once by comparing its first and last indices.
+## Constraints
 
-4. **Extract Unique Middle Characters**:  
-   - Use a `Set` to store all distinct middle characters found between the first and last occurrences.
+* `3 <= s.length <= 10^5`
+* `s` consists of only lowercase English letters (`'a'` - `'z'`).
 
-5. **Count Unique Palindromic Subsequences**:  
-   - Add the size of the `Set` to the result.
+## Intuition
 
----
+I thought: a length-3 palindrome must look like `a b a`. So if I fix the outer letter `a`, I only need to know which distinct letters `b` appear somewhere between two occurrences of `a`. If I take the earliest occurrence of `a` and the latest occurrence of `a`, any character between them can be a middle character for some `a b a` subsequence. So for each letter `a`, I count distinct letters in the substring between its first and last occurrence. Summing across all 26 letters gives the answer.
 
-### JavaScript Code  
+## Approach
 
-1. **Initialize Arrays**:  
-   - Create two arrays (`first` and `last`) of size 26 and set all elements to `-1`.
+1. Scan `s` once and record the **first** and **last** indices of every letter `'a'..'z'`.
+2. For each letter `ch` from `'a'` to `'z'`:
 
-2. **Track First and Last Indices**:  
-   - Loop through the string to determine the first and last occurrence of each character.
+   * If `first[ch] < last[ch]`, then the letter occurs at least twice.
+   * Count distinct letters that appear strictly between `first[ch]` and `last[ch]`. Each distinct middle letter `m` yields palindrome `ch m ch`.
+3. Sum those counts for all letters and return the sum.
 
-3. **Find Valid Characters for Palindromes**:  
-   - Check if a character appears more than once by comparing its first and last indices.
+This approach is simple and efficient because the alphabet size is constant (26).
 
-4. **Count Unique Middle Characters**:  
-   - Iterate over the range between the first and last indices and use a `Set` to store distinct middle characters.
+## Data Structures Used
 
-5. **Sum the Results**:  
-   - Add the number of unique middle characters (size of the `Set`) to the final count.
+* Fixed-size arrays (length 26) to store:
 
----
+  * `first` occurrences (int)
+  * `last` occurrences (int)
+  * `seen` flags when scanning a substring (boolean/bitset)
+* The input string `s` itself.
 
-### Python Code  
+## Operations & Behavior Summary
 
-1. **Set Up First and Last Occurrence Lists**:  
-   - Use two lists of size 26 initialized to `-1` to store the first and last occurrence indices of each character.
+* One linear scan to populate `first` and `last`.
+* For up to 26 letters, scan the substring between `first` and `last` to mark distinct middle letters.
+* For each outer letter, count distinct middle letters and add to result.
 
-2. **Populate First and Last Occurrences**:  
-   - Iterate over the string and update the `first` and `last` lists based on the character’s position.
+## Complexity
 
-3. **Identify Valid Characters for Palindromes**:  
-   - For each character in the alphabet, check if its first and last indices indicate multiple occurrences.
+* **Time Complexity:** `O(26 * n)` = `O(n)`, where `n` is `s.length`. (26 is constant so this is linear.)
 
-4. **Extract Middle Characters**:  
-   - Use a Python `set` to store unique characters between the first and last indices of valid characters.
-
-5. **Add to Result**:  
-   - Count the number of unique middle characters for each valid character and add them to the result.
+  * One pass to compute `first` and `last` indices: `O(n)`.
+  * For each of 26 letters, possibly scanning the substring between its first and last — worst-case 26 full scans = `26 * n` but constant factor only.
+* **Space Complexity:** `O(1)` (only constant extra memory: arrays of size 26, a few ints/booleans).
 
 ---
 
-### Go Code  
+## Multi-language Solutions
 
-1. **Initialize Arrays for Tracking Indices**:  
-   - Create two slices (`first` and `last`) of size 26 and initialize the `first` slice with `-1`.
+### C++
 
-2. **Populate the Arrays**:  
-   - Loop through the string to find the first and last occurrence of each character.
+```c++
+#include <bits/stdc++.h>
+using namespace std;
 
-3. **Validate Characters for Palindromes**:  
-   - Check if a character has multiple occurrences by comparing its first and last indices.
+class Solution {
+public:
+    int countPalindromicSubsequence(string s) {
+        int n = s.size();
+        const int A = 26;
+        vector<int> first(A, INT_MAX), last(A, -1);
+        // record first and last occurrence for every letter
+        for (int i = 0; i < n; ++i) {
+            int c = s[i] - 'a';
+            first[c] = min(first[c], i);
+            last[c] = max(last[c], i);
+        }
 
-4. **Store Unique Middle Characters**:  
-   - Use a map to store unique middle characters between the first and last indices of valid characters.
-
-5. **Count Palindromic Subsequences**:  
-   - Add the number of unique middle characters for each valid character to the total count.
+        int ans = 0;
+        // for each outer letter, count distinct middle letters between first and last
+        for (int c = 0; c < A; ++c) {
+            if (first[c] < last[c]) {
+                vector<bool> seen(A, false);
+                for (int i = first[c] + 1; i < last[c]; ++i) {
+                    seen[s[i] - 'a'] = true;
+                }
+                for (int j = 0; j < A; ++j) if (seen[j]) ++ans;
+            }
+        }
+        return ans;
+    }
+};
+```
 
 ---
 
-## Complexity Analysis  
+### Java
 
-- **Time Complexity**:  
-  - The solution involves two passes through the string: one to calculate first and last occurrences, and another to count unique middle characters.  
-  - Overall time complexity: \(O(n)\).
+```java
+import java.util.*;
 
-- **Space Complexity**:  
-  - We use additional data structures (arrays or sets) to store indices and unique characters.  
-  - Overall space complexity: \(O(n)\).
+class Solution {
+    public int countPalindromicSubsequence(String s) {
+        int n = s.length();
+        int A = 26;
+        int[] first = new int[A];
+        int[] last = new int[A];
+        Arrays.fill(first, Integer.MAX_VALUE);
+        Arrays.fill(last, -1);
+
+        // record first and last occurrence for every letter
+        for (int i = 0; i < n; ++i) {
+            int c = s.charAt(i) - 'a';
+            first[c] = Math.min(first[c], i);
+            last[c] = Math.max(last[c], i);
+        }
+
+        int ans = 0;
+        // for each outer letter, count distinct middle letters between first and last
+        for (int c = 0; c < A; ++c) {
+            if (first[c] < last[c]) {
+                boolean[] seen = new boolean[A];
+                for (int i = first[c] + 1; i < last[c]; ++i) {
+                    seen[s.charAt(i) - 'a'] = true;
+                }
+                for (int j = 0; j < A; ++j) if (seen[j]) ans++;
+            }
+        }
+        return ans;
+    }
+}
+```
 
 ---
 
-## Additional Notes  
+### JavaScript
 
-- The solution is optimized for large strings due to its linear time complexity.  
-- Using sets or maps ensures we only count unique middle characters efficiently.  
+```javascript
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var countPalindromicSubsequence = function(s) {
+    const n = s.length;
+    const A = 26;
+    const first = new Array(A).fill(Number.MAX_SAFE_INTEGER);
+    const last = new Array(A).fill(-1);
+    // record first and last occurrence
+    for (let i = 0; i < n; ++i) {
+        const c = s.charCodeAt(i) - 97;
+        first[c] = Math.min(first[c], i);
+        last[c] = Math.max(last[c], i);
+    }
 
-Feel free to explore the code in each language and try it with different test cases! 🚀  
+    let ans = 0;
+    for (let c = 0; c < A; ++c) {
+        if (first[c] < last[c]) {
+            const seen = new Array(A).fill(false);
+            for (let i = first[c] + 1; i < last[c]; ++i) {
+                seen[s.charCodeAt(i) - 97] = true;
+            }
+            for (let j = 0; j < A; ++j) if (seen[j]) ans++;
+        }
+    }
+    return ans;
+};
+```
+
+---
+
+### Python3
+
+```python3
+class Solution:
+    def countPalindromicSubsequence(self, s: str) -> int:
+        n = len(s)
+        A = 26
+        first = [10**9] * A
+        last = [-1] * A
+        # record first and last occurrence for each letter
+        for i, ch in enumerate(s):
+            idx = ord(ch) - ord('a')
+            if i < first[idx]:
+                first[idx] = i
+            if i > last[idx]:
+                last[idx] = i
+
+        ans = 0
+        # for each outer letter, count distinct middle letters between first and last
+        for c in range(A):
+            if first[c] < last[c]:
+                seen = [False] * A
+                for i in range(first[c] + 1, last[c]):
+                    seen[ord(s[i]) - ord('a')] = True
+                ans += sum(1 for x in seen if x)
+        return ans
+```
+
+---
+
+### Go
+
+```go
+package main
+
+func countPalindromicSubsequence(s string) int {
+    n := len(s)
+    const A = 26
+    first := make([]int, A)
+    last := make([]int, A)
+    for i := 0; i < A; i++ {
+        first[i] = 1<<30
+        last[i] = -1
+    }
+    // record first and last occurrence
+    for i := 0; i < n; i++ {
+        c := int(s[i] - 'a')
+        if i < first[c] {
+            first[c] = i
+        }
+        if i > last[c] {
+            last[c] = i
+        }
+    }
+
+    ans := 0
+    // for each outer letter, count distinct middle letters between first and last
+    for c := 0; c < A; c++ {
+        if first[c] < last[c] {
+            seen := make([]bool, A)
+            for i := first[c] + 1; i < last[c]; i++ {
+                seen[int(s[i]-'a')] = true
+            }
+            for j := 0; j < A; j++ {
+                if seen[j] {
+                    ans++
+                }
+            }
+        }
+    }
+    return ans
+}
+```
+
+---
+
+## Step-by-step Detailed Explanation (C++, Java, JavaScript, Python3, Go)
+
+I'll explain the key parts of the solution line-by-line in a language-agnostic way, then map to the languages above.
+
+### 1. Record first and last occurrence of each letter
+
+* Why: If a letter appears only once, it cannot be the outer letter `a` in `a b a`. If it appears at least twice, the earliest and latest occurrences form a boundary that covers all possible middle characters that can be used with that outer letter.
+* Implementation:
+
+  * Initialize `first` array with a large value (INF) and `last` with `-1`.
+  * Traverse the string index `i` from `0` to `n-1`.
+  * For each character `ch` compute `idx = ch - 'a'`.
+  * Update `first[idx] = min(first[idx], i)` and `last[idx] = max(last[idx], i)`.
+
+**C++/Java/Python/JS/Go mapping:** This corresponds to the first `for` loop in each code block where we fill `first` and `last`.
+
+### 2. For each possible outer letter, check feasibility
+
+* Why: Only letters with `first < last` appear at least twice and can form `a _ a`.
+* Implementation:
+
+  * Loop over `c` from `0` to `25`.
+  * If `first[c] >= last[c]`, skip — no valid pair.
+
+**Mapping:** The `if (first[c] < last[c])` check in codes.
+
+### 3. Count distinct middle letters strictly between `first` and `last`
+
+* Why: For a fixed outer letter `a`, any distinct `b` that appears between the earliest and latest `a` yields a unique palindrome `a b a`. Counting distinct letters avoids duplicates.
+* Implementation:
+
+  * Initialize a `seen[26] = {false}`.
+  * For `i` from `first[c] + 1` to `last[c] - 1`, mark `seen[indexOf(s[i])] = true`.
+  * Count how many `seen[j]` are true and add to `ans`.
+
+**Complexity note:** Counting distinct letters this way is efficient because the alphabet is size 26.
+
+### 4. Return the total `ans`
+
+* Sum over all 26 letters yields the number of unique length-3 palindromic subsequences.
+
+---
+
+## Examples
+
+1. **Input:** `s = "aabca"`
+   **Output:** `3`
+   **Explanation:** palindromes: `"aba"`, `"aaa"`, `"aca"`.
+
+2. **Input:** `s = "adc"`
+   **Output:** `0`
+   **Explanation:** no letter appears twice, so none possible.
+
+3. **Input:** `s = "bbcbaba"`
+   **Output:** `4`
+   **Explanation:** palindromes: `"bbb"`, `"bcb"`, `"bab"`, `"aba"`.
+
+---
+
+## How to use / Run locally
+
+### Python
+
+1. Save the Python solution in a file `solution.py`.
+2. Add a small runner:
+
+```python
+if __name__ == "__main__":
+    s = "bbcbaba"
+    print(Solution().countPalindromicSubsequence(s))
+```
+
+3. Run:
+
+```bash
+python3 solution.py
+```
+
+### JavaScript (Node.js)
+
+1. Save code in `solution.js`.
+2. Add:
+
+```javascript
+console.log(countPalindromicSubsequence("bbcbaba"));
+```
+
+3. Run:
+
+```bash
+node solution.js
+```
+
+### C++
+
+1. Put the class in a file `solution.cpp`.
+2. Add a `main()` to instantiate and call with a test string, and compile:
+
+```bash
+g++ -std=c++17 solution.cpp -o solution
+./solution
+```
+
+### Java
+
+1. Save as `Solution.java` with a `main()` that calls the method.
+2. Compile & run:
+
+```bash
+javac Solution.java
+java Solution
+```
+
+### Go
+
+1. Save code in `main.go`, add a `main()` to call the function.
+2. Run:
+
+```bash
+go run main.go
+```
+
+---
+
+## Notes & Optimizations
+
+* The current solution is simple and runs in linear time relative to `n` (with a constant factor 26). It's perfectly adequate for `n` up to `10^5`.
+* **Micro-optimization:** I could precompute prefix bitmasks of seen letters so that for any range `[l, r]` I can compute the distinct letters in `O(1)` using bit operations: `mask[r] ^ mask[l-1]` (or using `mask[r] & ~mask[l]` pattern carefully). That would convert the inner scans into constant-time checks per letter, giving a strict `O(n + 26)` runtime, but increases implementation complexity slightly.
+* **Memory:** Current approach uses constant extra space (arrays of size 26). The bitmask variant uses one integer per prefix (which is still `O(n)` extra memory but often acceptable).
+* The problem asks only for subsequences of length 3, making the alphabet-based approach the most natural.
+
+---
+
+## Author
+
+* [Md Aarzoo Islam](https://bento.me/withaarzoo)

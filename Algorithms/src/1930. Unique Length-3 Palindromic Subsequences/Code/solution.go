@@ -1,28 +1,39 @@
+package main
+
 func countPalindromicSubsequence(s string) int {
-    first := make([]int, 26)
-    last := make([]int, 26)
-    for i := range first {
-        first[i] = -1
+    n := len(s)
+    const A = 26
+    first := make([]int, A)
+    last := make([]int, A)
+    for i := 0; i < A; i++ {
+        first[i] = 1<<30
+        last[i] = -1
     }
-    
-    for i, char := range s {
-        index := int(char - 'a')
-        if first[index] == -1 {
-            first[index] = i
+    // record first and last occurrence
+    for i := 0; i < n; i++ {
+        c := int(s[i] - 'a')
+        if i < first[c] {
+            first[c] = i
         }
-        last[index] = i
+        if i > last[c] {
+            last[c] = i
+        }
     }
-    
-    result := 0
-    for i := 0; i < 26; i++ {
-        if first[i] != -1 && last[i] > first[i] {
-            middleChars := make(map[byte]bool)
-            for j := first[i] + 1; j < last[i]; j++ {
-                middleChars[s[j]] = true
+
+    ans := 0
+    // for each outer letter, count distinct middle letters between first and last
+    for c := 0; c < A; c++ {
+        if first[c] < last[c] {
+            seen := make([]bool, A)
+            for i := first[c] + 1; i < last[c]; i++ {
+                seen[int(s[i]-'a')] = true
             }
-            result += len(middleChars)
+            for j := 0; j < A; j++ {
+                if seen[j] {
+                    ans++
+                }
+            }
         }
     }
-    
-    return result
+    return ans
 }

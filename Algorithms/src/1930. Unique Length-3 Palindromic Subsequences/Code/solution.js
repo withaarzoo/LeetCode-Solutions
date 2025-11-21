@@ -3,25 +3,26 @@
  * @return {number}
  */
 var countPalindromicSubsequence = function (s) {
-  let first = Array(26).fill(-1);
-  let last = Array(26).fill(-1);
-
-  for (let i = 0; i < s.length; i++) {
-    let index = s.charCodeAt(i) - 97;
-    if (first[index] === -1) first[index] = i;
-    last[index] = i;
+  const n = s.length;
+  const A = 26;
+  const first = new Array(A).fill(Number.MAX_SAFE_INTEGER);
+  const last = new Array(A).fill(-1);
+  // record first and last occurrence
+  for (let i = 0; i < n; ++i) {
+    const c = s.charCodeAt(i) - 97;
+    first[c] = Math.min(first[c], i);
+    last[c] = Math.max(last[c], i);
   }
 
-  let result = 0;
-  for (let i = 0; i < 26; i++) {
-    if (first[i] !== -1 && last[i] > first[i]) {
-      let middleChars = new Set();
-      for (let j = first[i] + 1; j < last[i]; j++) {
-        middleChars.add(s[j]);
+  let ans = 0;
+  for (let c = 0; c < A; ++c) {
+    if (first[c] < last[c]) {
+      const seen = new Array(A).fill(false);
+      for (let i = first[c] + 1; i < last[c]; ++i) {
+        seen[s.charCodeAt(i) - 97] = true;
       }
-      result += middleChars.size;
+      for (let j = 0; j < A; ++j) if (seen[j]) ans++;
     }
   }
-
-  return result;
+  return ans;
 };
