@@ -1,34 +1,39 @@
-import java.util.HashMap;
+import java.util.*;
 
 class Solution {
     public int minSubarray(int[] nums, int p) {
-        long totalSum = 0;
-        for (int num : nums) {
-            totalSum += num;
+        long total = 0;
+        for (int x : nums) {
+            total = (total + x) % p; // keep modulo to avoid overflow
         }
 
-        // Find remainder when total sum is divided by p
-        int rem = (int) (totalSum % p);
-        if (rem == 0)
-            return 0; // If remainder is 0, no subarray needs to be removed
+        int need = (int) total;
+        if (need == 0)
+            return 0; // already divisible
 
-        HashMap<Integer, Integer> prefixMod = new HashMap<>();
-        prefixMod.put(0, -1); // Initialize to handle full prefix
-        long prefixSum = 0;
-        int minLength = nums.length;
+        int n = nums.length;
+        Map<Integer, Integer> lastIndex = new HashMap<>();
+        lastIndex.put(0, -1); // prefix before any element
 
-        for (int i = 0; i < nums.length; ++i) {
-            prefixSum += nums[i];
-            int currentMod = (int) (prefixSum % p);
-            int targetMod = (currentMod - rem + p) % p;
+        int ans = n;
+        long prefix = 0;
 
-            if (prefixMod.containsKey(targetMod)) {
-                minLength = Math.min(minLength, i - prefixMod.get(targetMod));
+        for (int i = 0; i < n; i++) {
+            prefix = (prefix + nums[i]) % p;
+            int prefMod = (int) prefix;
+
+            int target = prefMod - need;
+            if (target < 0)
+                target += p; // (prefMod - need + p) % p
+
+            if (lastIndex.containsKey(target)) {
+                ans = Math.min(ans, i - lastIndex.get(target));
             }
 
-            prefixMod.put(currentMod, i);
+            // store latest index for this prefix remainder
+            lastIndex.put(prefMod, i);
         }
 
-        return minLength == nums.length ? -1 : minLength;
+        return ans == n ? -1 : ans;
     }
 }

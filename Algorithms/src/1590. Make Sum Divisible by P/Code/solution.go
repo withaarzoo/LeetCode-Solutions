@@ -1,34 +1,44 @@
-func minSubarray(nums []int, p int) int {
-    totalSum := 0
-    for _, num := range nums {
-        totalSum += num
-    }
+package main
 
-    rem := totalSum % p
-    if rem == 0 {
+func minSubarray(nums []int, p int) int {
+    n := len(nums)
+    total := 0
+    for _, x := range nums {
+        total = (total + x) % p
+    }
+    
+    need := total
+    if need == 0 {
         return 0
     }
-
-    prefixMod := make(map[int]int)
-    prefixMod[0] = -1
-    prefixSum, minLength := 0, len(nums)
-
-    for i, num := range nums {
-        prefixSum += num
-        currentMod := prefixSum % p
-        targetMod := (currentMod - rem + p) % p
-
-        if idx, ok := prefixMod[targetMod]; ok {
-            if i-idx < minLength {
-                minLength = i - idx
+    
+    // map remainder -> latest index
+    lastIndex := make(map[int]int, n*2)
+    lastIndex[0] = -1
+    
+    ans := n
+    prefix := 0
+    
+    for i, x := range nums {
+        prefix = (prefix + x) % p
+        prefMod := prefix
+        
+        target := prefMod - need
+        if target < 0 {
+            target += p
+        }
+        
+        if j, ok := lastIndex[target]; ok {
+            if i-j < ans {
+                ans = i - j
             }
         }
-
-        prefixMod[currentMod] = i
+        
+        lastIndex[prefMod] = i
     }
-
-    if minLength == len(nums) {
+    
+    if ans == n {
         return -1
     }
-    return minLength
+    return ans
 }
