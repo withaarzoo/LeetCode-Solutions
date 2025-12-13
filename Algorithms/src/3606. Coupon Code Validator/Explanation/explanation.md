@@ -1,9 +1,3 @@
-Below is a **complete, clean, and GitHub-ready README.md** for **LeetCode 3606 – Coupon Code Validator**, written in **simple 12th-grade English**, in **my point of view**, and suitable for interviews, projects, and open-source sharing.
-
-You can **copy-paste this directly into README.md** ✅
-
----
-
 # Coupon Code Validator (LeetCode 3606)
 
 ## Table of Contents
