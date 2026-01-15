@@ -1,3 +1,8 @@
+#include <vector>
+#include <array>
+#include <algorithm>
+using namespace std;
+
 class Solution {
     vector<int> cnt;
     vector<double> segLen;
@@ -66,7 +71,8 @@ public:
             }
             int l = lower_bound(xs.begin(), xs.end(), e.x1) - xs.begin();
             int r = lower_bound(xs.begin(), xs.end(), e.x2) - xs.begin();
-            update(1, 0, n - 1, l, r, e.type);
+            if (r > n - 1) r = n - 1;
+            update(1, 0, n, l, r, e.type);
         }
 
         double half = total / 2.0;
