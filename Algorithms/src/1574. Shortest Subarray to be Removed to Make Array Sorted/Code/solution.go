@@ -1,43 +1,21 @@
-func findLengthOfShortestSubarray(arr []int) int {
-    n := len(arr)
-    
-    // Step 1: Find the longest non-decreasing prefix
-    left := 0
-    for left+1 < n && arr[left] <= arr[left+1] {
-        left++
+func findKthBit(n int, k int) byte {
+    // Base case
+    if n == 1 {
+        return '0'
     }
-    
-    // If the entire array is already sorted
-    if left == n-1 {
-        return 0
-    }
-    
-    // Step 2: Find the longest non-decreasing suffix
-    right := n - 1
-    for right > 0 && arr[right-1] <= arr[right] {
-        right--
-    }
-    
-    // Step 3: Find the minimum length to remove by comparing prefix and suffix
-    result := min(n-left-1, right)
-    
-    // Step 4: Use two pointers to find the smallest middle part to remove
-    i, j := 0, right
-    for i <= left && j < n {
-        if arr[i] <= arr[j] {
-            result = min(result, j-i-1)
-            i++
-        } else {
-            j++
-        }
-    }
-    
-    return result
-}
 
-func min(a, b int) int {
-    if a < b {
-        return a
+    length := (1 << n) - 1
+    mid := (length + 1) / 2
+
+    if k == mid {
+        return '1'
+    } else if k < mid {
+        return findKthBit(n-1, k)
+    } else {
+        bit := findKthBit(n-1, length-k+1)
+        if bit == '0' {
+            return '1'
+        }
+        return '0'
     }
-    return b
 }

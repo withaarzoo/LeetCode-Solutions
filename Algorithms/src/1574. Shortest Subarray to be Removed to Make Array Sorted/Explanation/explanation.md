@@ -1,109 +1,305 @@
-# Shortest Subarray to be Removed to Make Array Sorted
+# Problem Title
 
-## Problem Overview
+1. Find Kth Bit in Nth Binary String
 
-The goal is to find the minimum number of elements to remove from a given array in order to make the entire array sorted in non-decreasing order. The solution needs to identify and utilize already sorted segments of the array to minimize the number of elements that must be removed.
+---
+
+## Table of Contents
+
+* Problem Summary
+* Constraints
+* Intuition
+* Approach
+* Data Structures Used
+* Operations & Behavior Summary
+* Complexity
+* Multi-language Solutions
+
+  * C++
+  * Java
+  * JavaScript
+  * Python3
+  * Go
+* Step-by-step Detailed Explanation
+* Examples
+* How to use / Run locally
+* Notes & Optimizations
+* Author
+
+---
+
+## Problem Summary
+
+We are given two integers `n` and `k`.
+
+A binary string `S_n` is defined recursively:
+
+S1 = "0"
+S_i = S_(i-1) + "1" + reverse(invert(S_(i-1))) for i > 1
+
+Where:
+
+* `+` means concatenation
+* `reverse(x)` reverses the string
+* `invert(x)` flips every bit (0 becomes 1 and 1 becomes 0)
+
+Our task is to return the k-th bit (1-indexed) in `S_n`.
+
+---
+
+## Constraints
+
+* 1 <= n <= 20
+* 1 <= k <= 2^n - 1
+
+---
+
+## Intuition
+
+When I first saw this problem, I noticed that building the entire string is not practical. The size of the string grows exponentially.
+
+Length of S_n is:
+
+2^n - 1
+
+For n = 20, the string length is more than one million.
+
+So instead of building the full string, I observed the structure carefully:
+
+S_n = Left + Middle + Right
+
+Where:
+
+* Left = S_(n-1)
+* Middle = "1"
+* Right = reverse(invert(S_(n-1)))
+
+The middle element is always '1'.
+
+This structure is symmetric.
+
+So instead of generating the full string, I can determine where k lies and reduce the problem recursively.
 
 ---
 
 ## Approach
 
-### General Steps
+1. Compute total length = 2^n - 1.
+2. Compute middle index = (length + 1) / 2.
+3. If k == middle → return '1'.
+4. If k < middle → answer is same as findKthBit(n-1, k).
+5. If k > middle → it belongs to the right part.
 
-1. **Identify the Longest Sorted Prefix**:
-   - Start from the beginning of the array and move forward until you find a break in the non-decreasing order. This part of the array is the longest "prefix" that is already sorted.
+   * Mirror index = length - k + 1.
+   * Recursively compute findKthBit(n-1, mirror index).
+   * Invert the result.
+6. Base case: if n == 1 → return '0'.
 
-2. **Identify the Longest Sorted Suffix**:
-   - Starting from the end of the array, move backward until you find a break in the non-decreasing order. This part of the array is the longest "suffix" that is already sorted.
-
-3. **Check if Entire Array is Sorted**:
-   - If the longest sorted prefix already covers the entire array, no removal is needed, so the result is `0`.
-
-4. **Calculate Initial Minimum Removals**:
-   - If the entire array is not sorted, calculate the initial minimum number of elements to remove by either:
-     - Removing the entire suffix (from the end of the prefix to the array’s end).
-     - Removing the entire prefix (from the start to the beginning of the suffix).
-
-5. **Optimize Removal with Two Pointers**:
-   - Use a two-pointer technique to attempt merging parts of the prefix and suffix.
-   - Adjust pointers to find if a smaller section in between can be removed to achieve the sorted order, updating the minimum elements to remove if a smaller solution is found.
+This avoids constructing the full string.
 
 ---
 
-## Solutions in Multiple Languages
+## Data Structures Used
 
-### C++ Code - Step-by-Step Explanation
+No extra data structures are required.
 
-1. **Find the Longest Sorted Prefix**: Initialize a pointer from the start and increment it while the next element is larger than or equal to the current. Stop when the order breaks.
-
-2. **Find the Longest Sorted Suffix**: Initialize a pointer from the end and decrement it while the previous element is smaller than or equal to the current. Stop when the order breaks.
-
-3. **Check Full Array Condition**: If the prefix pointer reaches the end, the array is already sorted. Return `0`.
-
-4. **Calculate Initial Minimum Removals**: Compute the minimum removals by comparing two options:
-   - Removing all elements from the end of the prefix to the array's end.
-   - Removing all elements from the start to the beginning of the suffix.
-
-5. **Merge with Two-Pointer Technique**: Set two pointers on the prefix and suffix. Adjust them while maintaining sorted order, minimizing the number of elements to remove for a sorted result.
-
-### Java Code - Step-by-Step Explanation
-
-1. **Identify Longest Sorted Prefix**: Use a loop to traverse from the beginning, stopping when the non-decreasing order is broken.
-
-2. **Identify Longest Sorted Suffix**: Traverse from the end towards the beginning, stopping when the order breaks.
-
-3. **Full Array Check**: If the prefix pointer reaches the last index, the array is already sorted, so return `0`.
-
-4. **Calculate Minimum Removals**:
-   - Calculate the number of elements to remove if only keeping the prefix.
-   - Calculate the number of elements to remove if only keeping the suffix.
-   - Set the minimum of these values as the initial result.
-
-5. **Optimize with Two Pointers**: Using pointers on both the prefix and suffix, try merging sections and update the minimum removals if a smaller solution is possible.
-
-### JavaScript Code - Step-by-Step Explanation
-
-1. **Longest Sorted Prefix**: Start from index `0`, increment until reaching a break in the order.
-
-2. **Longest Sorted Suffix**: Start from the last index, decrement until reaching a break in the order.
-
-3. **Check if Sorted**: If the entire array is already sorted (i.e., the prefix reaches the end), return `0`.
-
-4. **Calculate Initial Minimum**: Evaluate the removals required by only keeping the prefix or only keeping the suffix and set the minimum.
-
-5. **Two-Pointer Optimization**: Use two pointers on the prefix and suffix to find a merged solution, minimizing the required removals by adjusting the pointers to maintain order.
-
-### Python Code - Step-by-Step Explanation
-
-1. **Find the Longest Non-Decreasing Prefix**: Initialize a pointer and move it forward while each element is less than or equal to the next.
-
-2. **Find the Longest Non-Decreasing Suffix**: Initialize a pointer at the end and move it backward while each element is greater than or equal to the previous.
-
-3. **Full Array Check**: If the prefix reaches the last element, the array is fully sorted, and the answer is `0`.
-
-4. **Initial Minimum Removals**: Calculate removals by keeping either the prefix or the suffix, whichever results in fewer removals.
-
-5. **Two-Pointer Technique for Optimal Merging**: Attempt to merge the prefix and suffix while keeping them in order. Adjust pointers to find the smallest number of elements that need to be removed.
-
-### Go Code - Step-by-Step Explanation
-
-1. **Identify Longest Sorted Prefix**: Set a pointer to start and increment as long as each element is in non-decreasing order with the next.
-
-2. **Identify Longest Sorted Suffix**: Set a pointer to the end and decrement while each element is in non-decreasing order with the previous.
-
-3. **Entire Array Check**: If the prefix covers the whole array, it’s already sorted, so return `0`.
-
-4. **Compute Initial Minimum Removals**: Calculate the required removals if keeping only the prefix or the suffix. Set the result to the minimum of these two values.
-
-5. **Two-Pointer Optimization for Minimal Removals**: Using two pointers on the prefix and suffix, move them towards each other while keeping the array sorted to find the minimal number of elements to remove.
+Only recursion stack is used.
 
 ---
 
-## Complexity Analysis
+## Operations & Behavior Summary
 
-- **Time Complexity**: \(O(n)\) - Each solution involves linear scans to identify the sorted prefix and suffix and a two-pointer pass, making the solution efficient.
-- **Space Complexity**: \(O(1)\) - Only a few variables are used for indices and result calculation, leading to constant extra space usage.
+* Recursive divide and conquer
+* Constant time calculations per level
+* Depth of recursion at most n (<= 20)
 
 ---
 
-Each solution leverages the initial sorted segments of the array (prefix and suffix) to minimize the removal count, making it a highly efficient approach to solve this problem.
+## Complexity
+
+Time Complexity: O(n)
+
+At each step, n decreases by 1. Maximum recursion depth is n.
+
+Space Complexity: O(n)
+
+Only recursion stack is used.
+
+---
+
+## Multi-language Solutions
+
+### C++
+
+```cpp
+class Solution {
+public:
+    char findKthBit(int n, int k) {
+        if (n == 1) return '0';
+
+        int length = (1 << n) - 1;
+        int mid = (length + 1) / 2;
+
+        if (k == mid) return '1';
+        else if (k < mid) return findKthBit(n - 1, k);
+        else {
+            char bit = findKthBit(n - 1, length - k + 1);
+            return bit == '0' ? '1' : '0';
+        }
+    }
+};
+```
+
+### Java
+
+```java
+class Solution {
+    public char findKthBit(int n, int k) {
+        if (n == 1) return '0';
+
+        int length = (1 << n) - 1;
+        int mid = (length + 1) / 2;
+
+        if (k == mid) return '1';
+        else if (k < mid) return findKthBit(n - 1, k);
+        else {
+            char bit = findKthBit(n - 1, length - k + 1);
+            return bit == '0' ? '1' : '0';
+        }
+    }
+}
+```
+
+### JavaScript
+
+```javascript
+var findKthBit = function(n, k) {
+    if (n === 1) return '0';
+
+    const length = (1 << n) - 1;
+    const mid = Math.floor((length + 1) / 2);
+
+    if (k === mid) return '1';
+    else if (k < mid) return findKthBit(n - 1, k);
+    else {
+        const bit = findKthBit(n - 1, length - k + 1);
+        return bit === '0' ? '1' : '0';
+    }
+};
+```
+
+### Python3
+
+```python
+class Solution:
+    def findKthBit(self, n: int, k: int) -> str:
+        if n == 1:
+            return "0"
+
+        length = (1 << n) - 1
+        mid = (length + 1) // 2
+
+        if k == mid:
+            return "1"
+        elif k < mid:
+            return self.findKthBit(n - 1, k)
+        else:
+            bit = self.findKthBit(n - 1, length - k + 1)
+            return "1" if bit == "0" else "0"
+```
+
+### Go
+
+```go
+func findKthBit(n int, k int) byte {
+    if n == 1 {
+        return '0'
+    }
+
+    length := (1 << n) - 1
+    mid := (length + 1) / 2
+
+    if k == mid {
+        return '1'
+    } else if k < mid {
+        return findKthBit(n-1, k)
+    } else {
+        bit := findKthBit(n-1, length-k+1)
+        if bit == '0' {
+            return '1'
+        }
+        return '0'
+    }
+}
+```
+
+---
+
+## Step-by-step Detailed Explanation (C++, Java, JavaScript, Python3, Go)
+
+1. If n == 1, return '0'. This is the base string.
+2. Compute total length = (1 << n) - 1.
+3. Compute mid = (length + 1) / 2.
+4. If k equals mid, return '1'. Middle element is always '1'.
+5. If k is less than mid, recursively solve for n-1.
+6. If k is greater than mid:
+
+   * Compute mirror index = length - k + 1.
+   * Recursively compute value at mirror index.
+   * Invert the result.
+7. Continue reducing n until base case.
+
+This works because right half is reversed and inverted version of left half.
+
+---
+
+## Examples
+
+Example 1:
+Input: n = 3, k = 1
+Output: "0"
+
+Example 2:
+Input: n = 4, k = 11
+Output: "1"
+
+---
+
+## How to use / Run locally
+
+C++:
+
+* Compile using g++
+* Run the executable
+
+Java:
+
+* Compile using javac
+* Run using java
+
+Python:
+
+* Run using python3 file.py
+
+JavaScript:
+
+* Run using node file.js
+
+Go:
+
+* Run using go run file.go
+
+---
+
+## Notes & Optimizations
+
+* Do not build the full string.
+* Use recursion to reduce problem size.
+* Maximum recursion depth is 20.
+* Very efficient and safe within constraints.
+
+---
+
+## Author
+
+* [Md Aarzoo Islam](https://bento.me/withaarzoo)
