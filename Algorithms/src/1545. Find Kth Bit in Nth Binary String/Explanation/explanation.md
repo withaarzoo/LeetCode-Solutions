@@ -1,131 +1,305 @@
-# Solution Explanation for "Find K-th Bit in N-th Binary String"
+# Problem Title
 
-This README contains step-by-step explanations of the solution in **C++**, **Java**, **JavaScript**, **Python**, and **Go**. Each explanation describes how the solution recursively calculates the K-th bit in the N-th binary string without generating the entire string. Instead, it takes advantage of the symmetry and structure of the string.
-
-## C++ Solution
-
-### Step-by-Step Explanation
-
-1. **Base Case Handling**:  
-   If `n` equals 1, return '0' immediately, since the first binary string (`S1`) is always "0".
-
-2. **Calculate Length of Sn**:  
-   For a given `n`, the total length of the binary string `Sn` is calculated as `2^n - 1`.
-
-3. **Determine Midpoint**:  
-   Find the middle position of the binary string `Sn`. The middle position is `(length / 2) + 1`.
-
-4. **Check If K is the Middle Bit**:  
-   If `k` equals the middle position, return '1', since the middle bit in any `Sn` is always '1'.
-
-5. **Check First Half**:  
-   If `k` is smaller than the middle position, the bit is located in the first half of the binary string. Recursively compute the K-th bit in `Sn-1`.
-
-6. **Check Second Half**:  
-   If `k` is greater than the middle position, the bit is located in the second half. This part is the reversed and inverted version of the first half. Recursively compute the K-th bit in `Sn-1`, but invert the result.
+1545. Find Kth Bit in Nth Binary String
 
 ---
 
-## Java Solution
+## Table of Contents
 
-### Step-by-Step Explanation
+* Problem Summary
+* Constraints
+* Intuition
+* Approach
+* Data Structures Used
+* Operations & Behavior Summary
+* Complexity
+* Multi-language Solutions
 
-1. **Handle Base Case**:  
-   When `n = 1`, return '0' because the first binary string (`S1`) is "0". This is our base case.
-
-2. **Calculate Length of Binary String**:  
-   For any given `n`, compute the length of the binary string as `2^n - 1`.
-
-3. **Locate Middle Bit**:  
-   The middle position in the binary string is the result of `(length / 2) + 1`.
-
-4. **Check for Middle Element**:  
-   If `k` equals the middle position, return '1'. This is because the middle bit is always '1' in all strings.
-
-5. **First Half Check**:  
-   If `k` is smaller than the middle, the K-th bit lies in the first half. Make a recursive call to find the K-th bit in `Sn-1`.
-
-6. **Second Half Check**:  
-   If `k` is larger than the middle, the K-th bit lies in the second half, which is the reversed and inverted version of the first half. Recursively call for the K-th bit in the first half, and invert the result.
-
----
-
-## JavaScript Solution
-
-### Step-by-Step Explanation
-
-1. **Handle Base Case**:  
-   For the simplest case where `n = 1`, the binary string is "0", so return '0'. This is our base condition for the recursion.
-
-2. **Calculate Length of the Current String**:  
-   Calculate the length of the binary string as `2^n - 1`, which represents the total length of `Sn`.
-
-3. **Find the Middle Position**:  
-   The middle element in the binary string `Sn` can be found by calculating `(length / 2) + 1`.
-
-4. **Check Middle Element**:  
-   If `k` is exactly the middle element, return '1' because the middle bit is always '1' in any of the binary strings.
-
-5. **Recurse for First Half**:  
-   If `k` is less than the middle, it means that the bit is in the first half of the string. Recursively find the bit by calling the function on `Sn-1`.
-
-6. **Recurse for Second Half**:  
-   If `k` is greater than the middle, the bit lies in the second half. The second half is the inverted and reversed version of the first half. Compute the bit recursively for `Sn-1`, and invert the result.
+  * C++
+  * Java
+  * JavaScript
+  * Python3
+  * Go
+* Step-by-step Detailed Explanation
+* Examples
+* How to use / Run locally
+* Notes & Optimizations
+* Author
 
 ---
 
-## Python Solution
+## Problem Summary
 
-### Step-by-Step Explanation
+We are given two integers `n` and `k`.
 
-1. **Base Case Condition**:  
-   The base case is when `n = 1`, where the binary string is "0". In this case, return '0'. This serves as the stopping condition for the recursion.
+A binary string `S_n` is defined recursively:
 
-2. **Calculate Length of Sn**:  
-   Compute the length of the binary string `Sn` as `2^n - 1`.
+S1 = "0"
+S_i = S_(i-1) + "1" + reverse(invert(S_(i-1))) for i > 1
 
-3. **Find the Middle Bit**:  
-   Calculate the middle position as `(length // 2) + 1`. This is where the symmetry of the string plays a role.
+Where:
 
-4. **Check for Middle Bit**:  
-   If `k` is equal to the middle position, return '1'. The middle bit in any `Sn` is always '1'.
+* `+` means concatenation
+* `reverse(x)` reverses the string
+* `invert(x)` flips every bit (0 becomes 1 and 1 becomes 0)
 
-5. **Handle First Half**:  
-   If `k` is less than the middle position, the bit lies in the first half of `Sn`. Recursively compute the K-th bit in `Sn-1`.
-
-6. **Handle Second Half**:  
-   If `k` is greater than the middle position, the bit lies in the second half of the string. The second half is an inverted and reversed version of the first half. Recursively compute the bit and invert the result.
+Our task is to return the k-th bit (1-indexed) in `S_n`.
 
 ---
 
-## Go Solution
+## Constraints
 
-### Step-by-Step Explanation
-
-1. **Base Case Check**:  
-   When `n = 1`, return '0' since the first binary string (`S1`) is "0". This is the simplest case and serves as the stopping condition.
-
-2. **Calculate the Length of Sn**:  
-   For any given `n`, calculate the length of the binary string `Sn` as `2^n - 1`.
-
-3. **Determine the Midpoint**:  
-   The middle position of `Sn` can be found by computing `(length / 2) + 1`. This divides the string into two symmetric parts.
-
-4. **Check if K is in the Middle**:  
-   If `k` equals the middle position, return '1'. The middle bit is always '1' in every binary string.
-
-5. **Handle First Half**:  
-   If `k` is less than the middle, the K-th bit lies in the first half of `Sn`. Recursively compute the bit by reducing the problem to `Sn-1`.
-
-6. **Handle Second Half**:  
-   If `k` is greater than the middle, the bit lies in the second half. This half is an inverted and reversed version of the first half. Recursively compute the K-th bit in `Sn-1` and invert the result.
+* 1 <= n <= 20
+* 1 <= k <= 2^n - 1
 
 ---
 
-## Conclusion
+## Intuition
 
-Across all five languages, the logic follows the same recursive pattern:
+When I first saw this problem, I noticed that building the entire string is not practical. The size of the string grows exponentially.
 
-- If the bit is in the first half, we reduce the problem to `Sn-1`.
-- If the bit is in the second half, we also reduce the problem to `Sn-1` but with an inverted result.
-- This efficient recursion avoids the need to construct the entire binary string, saving both time and space.
+Length of S_n is:
+
+2^n - 1
+
+For n = 20, the string length is more than one million.
+
+So instead of building the full string, I observed the structure carefully:
+
+S_n = Left + Middle + Right
+
+Where:
+
+* Left = S_(n-1)
+* Middle = "1"
+* Right = reverse(invert(S_(n-1)))
+
+The middle element is always '1'.
+
+This structure is symmetric.
+
+So instead of generating the full string, I can determine where k lies and reduce the problem recursively.
+
+---
+
+## Approach
+
+1. Compute total length = 2^n - 1.
+2. Compute middle index = (length + 1) / 2.
+3. If k == middle → return '1'.
+4. If k < middle → answer is same as findKthBit(n-1, k).
+5. If k > middle → it belongs to the right part.
+
+   * Mirror index = length - k + 1.
+   * Recursively compute findKthBit(n-1, mirror index).
+   * Invert the result.
+6. Base case: if n == 1 → return '0'.
+
+This avoids constructing the full string.
+
+---
+
+## Data Structures Used
+
+No extra data structures are required.
+
+Only recursion stack is used.
+
+---
+
+## Operations & Behavior Summary
+
+* Recursive divide and conquer
+* Constant time calculations per level
+* Depth of recursion at most n (<= 20)
+
+---
+
+## Complexity
+
+Time Complexity: O(n)
+
+At each step, n decreases by 1. Maximum recursion depth is n.
+
+Space Complexity: O(n)
+
+Only recursion stack is used.
+
+---
+
+## Multi-language Solutions
+
+### C++
+
+```cpp
+class Solution {
+public:
+    char findKthBit(int n, int k) {
+        if (n == 1) return '0';
+
+        int length = (1 << n) - 1;
+        int mid = (length + 1) / 2;
+
+        if (k == mid) return '1';
+        else if (k < mid) return findKthBit(n - 1, k);
+        else {
+            char bit = findKthBit(n - 1, length - k + 1);
+            return bit == '0' ? '1' : '0';
+        }
+    }
+};
+```
+
+### Java
+
+```java
+class Solution {
+    public char findKthBit(int n, int k) {
+        if (n == 1) return '0';
+
+        int length = (1 << n) - 1;
+        int mid = (length + 1) / 2;
+
+        if (k == mid) return '1';
+        else if (k < mid) return findKthBit(n - 1, k);
+        else {
+            char bit = findKthBit(n - 1, length - k + 1);
+            return bit == '0' ? '1' : '0';
+        }
+    }
+}
+```
+
+### JavaScript
+
+```javascript
+var findKthBit = function(n, k) {
+    if (n === 1) return '0';
+
+    const length = (1 << n) - 1;
+    const mid = Math.floor((length + 1) / 2);
+
+    if (k === mid) return '1';
+    else if (k < mid) return findKthBit(n - 1, k);
+    else {
+        const bit = findKthBit(n - 1, length - k + 1);
+        return bit === '0' ? '1' : '0';
+    }
+};
+```
+
+### Python3
+
+```python
+class Solution:
+    def findKthBit(self, n: int, k: int) -> str:
+        if n == 1:
+            return "0"
+
+        length = (1 << n) - 1
+        mid = (length + 1) // 2
+
+        if k == mid:
+            return "1"
+        elif k < mid:
+            return self.findKthBit(n - 1, k)
+        else:
+            bit = self.findKthBit(n - 1, length - k + 1)
+            return "1" if bit == "0" else "0"
+```
+
+### Go
+
+```go
+func findKthBit(n int, k int) byte {
+    if n == 1 {
+        return '0'
+    }
+
+    length := (1 << n) - 1
+    mid := (length + 1) / 2
+
+    if k == mid {
+        return '1'
+    } else if k < mid {
+        return findKthBit(n-1, k)
+    } else {
+        bit := findKthBit(n-1, length-k+1)
+        if bit == '0' {
+            return '1'
+        }
+        return '0'
+    }
+}
+```
+
+---
+
+## Step-by-step Detailed Explanation (C++, Java, JavaScript, Python3, Go)
+
+1. If n == 1, return '0'. This is the base string.
+2. Compute total length = (1 << n) - 1.
+3. Compute mid = (length + 1) / 2.
+4. If k equals mid, return '1'. Middle element is always '1'.
+5. If k is less than mid, recursively solve for n-1.
+6. If k is greater than mid:
+
+   * Compute mirror index = length - k + 1.
+   * Recursively compute value at mirror index.
+   * Invert the result.
+7. Continue reducing n until base case.
+
+This works because right half is reversed and inverted version of left half.
+
+---
+
+## Examples
+
+Example 1:
+Input: n = 3, k = 1
+Output: "0"
+
+Example 2:
+Input: n = 4, k = 11
+Output: "1"
+
+---
+
+## How to use / Run locally
+
+C++:
+
+* Compile using g++
+* Run the executable
+
+Java:
+
+* Compile using javac
+* Run using java
+
+Python:
+
+* Run using python3 file.py
+
+JavaScript:
+
+* Run using node file.js
+
+Go:
+
+* Run using go run file.go
+
+---
+
+## Notes & Optimizations
+
+* Do not build the full string.
+* Use recursion to reduce problem size.
+* Maximum recursion depth is 20.
+* Very efficient and safe within constraints.
+
+---
+
+## Author
+
+* [Md Aarzoo Islam](https://bento.me/withaarzoo)
