@@ -3,67 +3,70 @@ class Solution
 public:
     vector<int> survivedRobotsHealths(vector<int> &positions, vector<int> &healths, string directions)
     {
-        int n = positions.size();       // Get the number of robots
-        vector<int> indices(n), result; // Create indices array and result array
-        stack<int> stack;               // Stack to keep track of robots moving to the right ('R')
+        int n = positions.size();
 
-        // Initialize the indices array with 0 to n-1
-        for (int index = 0; index < n; ++index)
+        // Store robot indices
+        vector<int> indices(n);
+        for (int i = 0; i < n; i++)
         {
-            indices[index] = index;
+            indices[i] = i;
         }
 
-        // Sort the indices based on the positions of robots
-        sort(indices.begin(), indices.end(),
-             [&](int lhs, int rhs)
-             { return positions[lhs] < positions[rhs]; });
+        // Sort indices based on robot positions
+        sort(indices.begin(), indices.end(), [&](int a, int b)
+             { return positions[a] < positions[b]; });
 
-        // Iterate over each robot in the sorted order of their positions
-        for (int currentIndex : indices)
+        // Stack to keep indices of robots moving right
+        stack<int> st;
+
+        for (int idx : indices)
         {
-            // If the current robot is moving to the right, push its index onto the stack
-            if (directions[currentIndex] == 'R')
+            // If robot moves right, push it into stack
+            if (directions[idx] == 'R')
             {
-                stack.push(currentIndex);
+                st.push(idx);
             }
             else
             {
-                // If the current robot is moving to the left, check for collisions with robots in the stack
-                while (!stack.empty() && healths[currentIndex] > 0)
+                // Current robot is moving left
+                while (!st.empty() && healths[idx] > 0)
                 {
-                    int topIndex = stack.top(); // Get the index of the robot at the top of the stack
-                    stack.pop();                // Remove the top robot from the stack
+                    int topIdx = st.top();
 
-                    // Determine the result of the collision based on healths
-                    if (healths[topIndex] > healths[currentIndex])
+                    // Right robot has smaller health
+                    if (healths[topIdx] < healths[idx])
                     {
-                        healths[topIndex] -= 1;    // Decrease the health of the top robot
-                        healths[currentIndex] = 0; // Set the current robot's health to 0 (it is destroyed)
-                        stack.push(topIndex);      // Push the top robot back onto the stack
+                        st.pop();
+                        healths[idx]--;
+                        healths[topIdx] = 0;
                     }
-                    else if (healths[topIndex] < healths[currentIndex])
+                    // Both have same health
+                    else if (healths[topIdx] == healths[idx])
                     {
-                        healths[currentIndex] -= 1; // Decrease the health of the current robot
-                        healths[topIndex] = 0;      // Set the top robot's health to 0 (it is destroyed)
+                        st.pop();
+                        healths[topIdx] = 0;
+                        healths[idx] = 0;
                     }
+                    // Left robot has smaller health
                     else
                     {
-                        // Both robots have the same health, so they destroy each other
-                        healths[currentIndex] = 0;
-                        healths[topIndex] = 0;
+                        healths[topIdx]--;
+                        healths[idx] = 0;
                     }
                 }
             }
         }
 
-        // Collect the healths of the surviving robots
-        for (int index = 0; index < n; ++index)
+        // Collect surviving robots in original order
+        vector<int> result;
+        for (int i = 0; i < n; i++)
         {
-            if (healths[index] > 0)
+            if (healths[i] > 0)
             {
-                result.push_back(healths[index]);
+                result.push_back(healths[i]);
             }
         }
-        return result; // Return the healths of the surviving robots
+
+        return result;
     }
 };

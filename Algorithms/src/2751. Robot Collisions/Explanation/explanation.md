@@ -1,196 +1,268 @@
-# Robot Collisions Problem
+# 2751. Robot Collisions
 
-This repository contains solutions in multiple programming languages (C++, Java, JavaScript, Python, Go) for the "Robot Collisions" problem on LeetCode. The problem involves simulating the movements of robots on a line and handling collisions based on their health.
+## Table of Contents
 
-## Problem Description
+* [Problem Summary](#problem-summary)
+* [Constraints](#constraints)
+* [Intuition](#intuition)
+* [Approach](#approach)
+* [Data Structures Used](#data-structures-used)
+* [Operations & Behavior Summary](#operations--behavior-summary)
+* [Complexity](#complexity)
+* [Multi-language Solutions](#multi-language-solutions)
 
-There are `n` robots each with a position, health, and movement direction ('L' for left or 'R' for right). Robots move simultaneously in their directions, and if two robots collide at the same position, the robot with lower health is removed. If both have the same health, both are removed.
+  * [C++](#c)
+  * [Java](#java)
+  * [JavaScript](#javascript)
+  * [Python3](#python3)
+  * [Go](#go)
+* [Step-by-step Detailed Explanation](#step-by-step-detailed-explanation)
+* [Examples](#examples)
+* [How to use / Run locally](#how-to-use--run-locally)
+* [Notes & Optimizations](#notes--optimizations)
+* [Author](#author)
 
-### Example
+## Problem Summary
 
-Input:
+There are `n` robots placed on a line.
 
-- Positions: [5, 4, 3, 2, 1]
-- Healths: [2, 17, 9, 15, 10]
-- Directions: "RRRRR"
+Each robot has:
 
-Output:
+* A position
+* A health value
+* A moving direction (`L` or `R`)
 
-- [2, 17, 9, 15, 10]
+All robots start moving at the same speed.
 
-Explanation:
-No collisions occur since all robots move in the same direction ('R'). Thus, the healths remain unchanged.
+If two robots collide:
 
-## C++ Solution
+* The robot with smaller health gets removed.
+* The robot with larger health survives and loses `1` health.
+* If both robots have equal health, both robots are removed.
+
+I need to return the health values of the surviving robots in the same order as the input.
+
+## Constraints
+
+```text
+1 <= positions.length == healths.length == directions.length <= 10^5
+1 <= positions[i], healths[i] <= 10^9
+positions[i] are unique
+ directions[i] is either 'L' or 'R'
+```
+
+## Intuition
+
+I noticed that collisions only happen when:
+
+* One robot is moving right
+* Another robot after it is moving left
+
+That means I do not need to compare every pair of robots.
+
+I can sort robots by their positions and process them from left to right.
+
+Whenever I see a robot moving right, I store it.
+
+Whenever I see a robot moving left, I try to collide it with the latest right-moving robot.
+
+This is exactly the type of problem where a stack works very well.
+
+## Approach
+
+1. Store every robot with its original index.
+2. Sort robots based on position.
+3. Use a stack to keep robots moving right.
+4. If current robot is moving right, push it into the stack.
+5. If current robot is moving left:
+
+   * Compare it with the top robot from the stack.
+   * Keep colliding until:
+
+     * Current robot dies
+     * Stack becomes empty
+6. At the end, return all robots whose health is greater than `0`.
+
+## Data Structures Used
+
+* Array / Vector / List
+
+  * To store robot indices and final answers.
+
+* Stack
+
+  * To store robots moving right.
+
+* Sorting
+
+  * To process robots in position order.
+
+## Operations & Behavior Summary
+
+| Situation                              | Result                                             |
+| -------------------------------------- | -------------------------------------------------- |
+| Right robot health < Left robot health | Right robot dies, left robot health decreases by 1 |
+| Right robot health > Left robot health | Left robot dies, right robot health decreases by 1 |
+| Both health equal                      | Both robots die                                    |
+| No right-moving robot available        | Left robot survives                                |
+
+## Complexity
+
+* Time Complexity: `O(n log n)`
+
+  * Sorting takes `O(n log n)`
+  * Stack processing takes `O(n)`
+
+* Space Complexity: `O(n)`
+
+  * Extra stack and index array are used.
+
+## Multi-language Solutions
+
+### C++
 
 ```cpp
 class Solution {
 public:
     vector<int> survivedRobotsHealths(vector<int>& positions, vector<int>& healths, string directions) {
         int n = positions.size();
-        vector<int> indices(n), result;
-        stack<int> stack;
 
-        // Create indices array for sorting
-        for (int index = 0; index < n; ++index) {
-            indices[index] = index;
+        vector<int> indices(n);
+        for (int i = 0; i < n; i++) {
+            indices[i] = i;
         }
 
-        // Sort indices based on positions
-        sort(indices.begin(), indices.end(),
-             [&](int lhs, int rhs) { return positions[lhs] < positions[rhs]; });
+        sort(indices.begin(), indices.end(), [&](int a, int b) {
+            return positions[a] < positions[b];
+        });
 
-        // Process robots according to sorted order
-        for (int currentIndex : indices) {
-            if (directions[currentIndex] == 'R') {
-                stack.push(currentIndex);
+        stack<int> st;
+
+        for (int idx : indices) {
+            if (directions[idx] == 'R') {
+                st.push(idx);
             } else {
-                // Handle left-moving robots
-                while (!stack.empty() && healths[currentIndex] > 0) {
-                    int topIndex = stack.top();
-                    stack.pop();
+                while (!st.empty() && healths[idx] > 0) {
+                    int topIdx = st.top();
 
-                    if (healths[topIndex] > healths[currentIndex]) {
-                        healths[topIndex] -= 1;
-                        healths[currentIndex] = 0;
-                        stack.push(topIndex);
-                    } else if (healths[topIndex] < healths[currentIndex]) {
-                        healths[currentIndex] -= 1;
-                        healths[topIndex] = 0;
+                    if (healths[topIdx] < healths[idx]) {
+                        st.pop();
+                        healths[idx]--;
+                        healths[topIdx] = 0;
+                    } else if (healths[topIdx] == healths[idx]) {
+                        st.pop();
+                        healths[topIdx] = 0;
+                        healths[idx] = 0;
                     } else {
-                        healths[currentIndex] = 0;
-                        healths[topIndex] = 0;
+                        healths[topIdx]--;
+                        healths[idx] = 0;
                     }
                 }
             }
         }
 
-        // Collect surviving robot healths
-        for (int index = 0; index < n; ++index) {
-            if (healths[index] > 0) {
-                result.push_back(healths[index]);
+        vector<int> result;
+        for (int health : healths) {
+            if (health > 0) {
+                result.push_back(health);
             }
         }
+
         return result;
     }
 };
 ```
 
-### Explanation
-
-1. **Initialization**: Initialize `indices` to keep track of original indices, `stack` to manage right-moving robots, and `result` to store surviving robot healths.
-2. **Sorting**: Sort `indices` based on robot positions to process robots in order of their positions.
-3. **Processing Robots**: Iterate over sorted indices. If robot moves right ('R'), push its index onto `stack`. If left ('L'), handle collisions with robots in `stack`.
-4. **Collision Handling**: Compare healths of colliding robots. Update healths accordingly and mark robots as removed if healths are equal.
-5. **Result Collection**: After processing all robots, collect healths of surviving robots in `result`.
-
----
-
-## Java Solution
+### Java
 
 ```java
-import java.util.*;
-
 class Solution {
     public List<Integer> survivedRobotsHealths(int[] positions, int[] healths, String directions) {
         int n = positions.length;
-        List<Integer> result = new ArrayList<>();
-        int[] indices = new int[n];
-        Stack<Integer> stack = new Stack<>();
 
-        // Create indices array for sorting
+        Integer[] indices = new Integer[n];
         for (int i = 0; i < n; i++) {
             indices[i] = i;
         }
 
-        // Sort indices based on positions
-        Arrays.sort(indices, (a, b) -> Integer.compare(positions[a], positions[b]));
+        Arrays.sort(indices, (a, b) -> positions[a] - positions[b]);
 
-        // Process robots according to sorted order
-        for (int currentIndex : indices) {
-            if (directions.charAt(currentIndex) == 'R') {
-                stack.push(currentIndex);
+        Stack<Integer> stack = new Stack<>();
+
+        for (int idx : indices) {
+            if (directions.charAt(idx) == 'R') {
+                stack.push(idx);
             } else {
-                // Handle left-moving robots
-                while (!stack.isEmpty() && healths[currentIndex] > 0) {
-                    int topIndex = stack.pop();
+                while (!stack.isEmpty() && healths[idx] > 0) {
+                    int topIdx = stack.peek();
 
-                    if (healths[topIndex] > healths[currentIndex]) {
-                        healths[topIndex] -= 1;
-                        healths[currentIndex] = 0;
-                        stack.push(topIndex);
-                    } else if (healths[topIndex] < healths[currentIndex]) {
-                        healths[currentIndex] -= 1;
-                        healths[topIndex] = 0;
+                    if (healths[topIdx] < healths[idx]) {
+                        stack.pop();
+                        healths[idx]--;
+                        healths[topIdx] = 0;
+                    } else if (healths[topIdx] == healths[idx]) {
+                        stack.pop();
+                        healths[topIdx] = 0;
+                        healths[idx] = 0;
                     } else {
-                        healths[currentIndex] = 0;
-                        healths[topIndex] = 0;
+                        healths[topIdx]--;
+                        healths[idx] = 0;
                     }
                 }
             }
         }
 
-        // Collect surviving robot healths
-        for (int i = 0; i < n; i++) {
-            if (healths[i] > 0) {
-                result.add(healths[i]);
+        List<Integer> result = new ArrayList<>();
+        for (int health : healths) {
+            if (health > 0) {
+                result.add(health);
             }
         }
+
         return result;
     }
 }
 ```
 
-### Explanation
-
-1. **Initialization**: Initialize `indices` to keep track of original indices, `stack` to manage right-moving robots, and `result` to store surviving robot healths.
-2. **Sorting**: Sort `indices` based on robot positions to process robots in order of their positions.
-3. **Processing Robots**: Iterate over sorted indices. If robot moves right ('R'), push its index onto `stack`. If left ('L'), handle collisions with robots in `stack`.
-4. **Collision Handling**: Compare healths of colliding robots. Update healths accordingly and mark robots as removed if healths are equal.
-5. **Result Collection**: After processing all robots, collect healths of surviving robots in `result`.
-
----
-
-## JavaScript Solution
+### JavaScript
 
 ```javascript
 var survivedRobotsHealths = function(positions, healths, directions) {
-    let n = positions.length;
-    let indices = Array.from({length: n}, (_, i) => i);
-    let stack = [];
-    let result = [];
+    const n = positions.length;
 
-    // Sort indices based on positions
+    const indices = Array.from({ length: n }, (_, i) => i);
     indices.sort((a, b) => positions[a] - positions[b]);
 
-    // Process robots according to sorted order
-    for (let currentIndex of indices) {
-        if (directions[currentIndex] === 'R') {
-            stack.push(currentIndex);
-        } else {
-            // Handle left-moving robots
-            while (stack.length > 0 && healths[currentIndex] > 0) {
-                let topIndex = stack.pop();
+    const stack = [];
 
-                if (healths[topIndex] > healths[currentIndex]) {
-                    healths[topIndex] -= 1;
-                    healths[currentIndex] = 0;
-                    stack.push(topIndex);
-                } else if (healths[topIndex] < healths[currentIndex]) {
-                    healths[currentIndex] -= 1;
-                    healths[topIndex] = 0;
+    for (const idx of indices) {
+        if (directions[idx] === 'R') {
+            stack.push(idx);
+        } else {
+            while (stack.length > 0 && healths[idx] > 0) {
+                const topIdx = stack[stack.length - 1];
+
+                if (healths[topIdx] < healths[idx]) {
+                    stack.pop();
+                    healths[idx]--;
+                    healths[topIdx] = 0;
+                } else if (healths[topIdx] === healths[idx]) {
+                    stack.pop();
+                    healths[topIdx] = 0;
+                    healths[idx] = 0;
                 } else {
-                    healths[currentIndex] = 0;
-                    healths[topIndex] = 0;
+                    healths[topIdx]--;
+                    healths[idx] = 0;
                 }
             }
         }
     }
 
-    // Collect surviving robot healths
-    for (let i = 0; i < n; i++) {
-        if (healths[i] > 0) {
-            result.push(healths[i]);
+    const result = [];
+
+    for (const health of healths) {
+        if (health > 0) {
+            result.push(health);
         }
     }
 
@@ -198,123 +270,89 @@ var survivedRobotsHealths = function(positions, healths, directions) {
 };
 ```
 
-### Explanation
-
-1. **Initialization**: Initialize `indices` to keep track of original indices, `stack` to manage right-moving robots, and `result` to store surviving robot healths.
-2. **Sorting**: Sort `indices` based on robot positions to process robots in order of their positions.
-3. **Processing Robots**: Iterate over sorted indices. If robot moves right ('R'), push its index onto `stack`. If left ('L'), handle collisions with robots in `stack`.
-4. **Collision Handling**: Compare healths of colliding robots. Update healths accordingly and mark robots as removed if healths are equal.
-5. **Result Collection**: After processing all robots, collect healths of surviving robots in `result`.
-
----
-
-## Python Solution
+### Python3
 
 ```python
 class Solution:
-    def survivedRobotsHealths(self, positions: List[int], healths: List[int], directions: str) -> List[int]:
+    def survivedRobotsHealths(self, positions, healths, directions):
         n = len(positions)
+
         indices = list(range(n))
+        indices.sort(key=lambda i: positions[i])
+
         stack = []
-        result = []
 
-        # Sort indices based on positions
-        indices.sort(key=lambda x: positions[x])
-
-        # Process robots according to sorted order
-        for currentIndex in indices:
-            if directions[currentIndex] == 'R':
-                stack.append(currentIndex)
+        for idx in indices:
+            if directions[idx] == 'R':
+                stack.append(idx)
             else:
-                # Handle left-moving robots
-                while stack and healths[currentIndex] > 0:
-                    topIndex = stack.pop()
+                while stack and healths[idx] > 0:
+                    top_idx = stack[-1]
 
-                    if healths[topIndex] > healths[currentIndex]:
-                        healths[topIndex] -= 1
-                        healths[currentIndex] = 0
-                        stack.append(topIndex)
-                    elif healths[topIndex] < healths[currentIndex]:
-                        healths[currentIndex] -= 1
-                        healths[topIndex] = 0
+                    if healths[top_idx] < healths[idx]:
+                        stack.pop()
+                        healths[idx] -= 1
+                        healths[top_idx] = 0
+                    elif healths[top_idx] == healths[idx]:
+                        stack.pop()
+                        healths[top_idx] = 0
+                        healths[idx] = 0
                     else:
-                        healths[currentIndex] = 0
-                        healths[topIndex] = 0
+                        healths[top_idx] -= 1
+                        healths[idx] = 0
 
-        # Collect surviving robot healths
-        for i in range(n):
-            if healths[i] > 0:
-                result.append(healths[i])
+        result = []
+        for health in healths:
+            if health > 0:
+                result.append(health)
 
         return result
-``
+```
 
-`
-
-### Explanation
-
-1. **Initialization**: Initialize `indices` to keep track of original indices, `stack` to manage right-moving robots, and `result` to store surviving robot healths.
-2. **Sorting**: Sort `indices` based on robot positions to process robots in order of their positions.
-3. **Processing Robots**: Iterate over sorted indices. If robot moves right ('R'), push its index onto `stack`. If left ('L'), handle collisions with robots in `stack`.
-4. **Collision Handling**: Compare healths of colliding robots. Update healths accordingly and mark robots as removed if healths are equal.
-5. **Result Collection**: After processing all robots, collect healths of surviving robots in `result`.
-
----
-
-## Go Solution
+### Go
 
 ```go
-package main
-
-import (
-    "sort"
-)
-
 func survivedRobotsHealths(positions []int, healths []int, directions string) []int {
     n := len(positions)
-    indices := make([]int, n)
-    stack := []int{}
-    result := []int{}
 
-    // Create indices array for sorting
-    for i := range indices {
+    indices := make([]int, n)
+    for i := 0; i < n; i++ {
         indices[i] = i
     }
 
-    // Sort indices based on positions
-    sort.Slice(indices, func(a, b int) bool {
-        return positions[a] < positions[b]
+    sort.Slice(indices, func(i, j int) bool {
+        return positions[indices[i]] < positions[indices[j]]
     })
 
-    // Process robots according to sorted order
-    for _, currentIndex := range indices {
-        if directions[currentIndex] == 'R' {
-            stack = append(stack, currentIndex)
-        } else {
-            // Handle left-moving robots
-            for len(stack) > 0 && healths[currentIndex] > 0 {
-                topIndex := stack[len(stack)-1]
-                stack = stack[:len(stack)-1]
+    stack := []int{}
 
-                if healths[topIndex] > healths[currentIndex] {
-                    healths[topIndex] -= 1
-                    healths[currentIndex] = 0
-                    stack = append(stack, topIndex)
-                } else if healths[topIndex] < healths[currentIndex] {
-                    healths[currentIndex] -= 1
-                    healths[topIndex] = 0
+    for _, idx := range indices {
+        if directions[idx] == 'R' {
+            stack = append(stack, idx)
+        } else {
+            for len(stack) > 0 && healths[idx] > 0 {
+                topIdx := stack[len(stack)-1]
+
+                if healths[topIdx] < healths[idx] {
+                    stack = stack[:len(stack)-1]
+                    healths[idx]--
+                    healths[topIdx] = 0
+                } else if healths[topIdx] == healths[idx] {
+                    stack = stack[:len(stack)-1]
+                    healths[topIdx] = 0
+                    healths[idx] = 0
                 } else {
-                    healths[currentIndex] = 0
-                    healths[topIndex] = 0
+                    healths[topIdx]--
+                    healths[idx] = 0
                 }
             }
         }
     }
 
-    // Collect surviving robot healths
-    for i := 0; i < n; i++ {
-        if healths[i] > 0 {
-            result = append(result, healths[i])
+    result := []int{}
+    for _, health := range healths {
+        if health > 0 {
+            result = append(result, health)
         }
     }
 
@@ -322,14 +360,136 @@ func survivedRobotsHealths(positions []int, healths []int, directions string) []
 }
 ```
 
-### Explanation
+## Step-by-step Detailed Explanation
 
-1. **Initialization**: Initialize `indices` to keep track of original indices, `stack` to manage right-moving robots, and `result` to store surviving robot healths.
-2. **Sorting**: Sort `indices` based on robot positions to process robots in order of their positions.
-3. **Processing Robots**: Iterate over sorted indices. If robot moves right ('R'), push its index onto `stack`. If left ('L'), handle collisions with robots in `stack`.
-4. **Collision Handling**: Compare healths of colliding robots. Update healths accordingly and mark robots as removed if healths are equal.
-5. **Result Collection**: After processing all robots, collect healths of surviving robots in `result`.
+### C++
+
+* Create an index array from `0` to `n-1`
+* Sort indices according to robot positions
+* Use a stack for robots moving right
+* If current robot moves left, compare with stack top
+* Update health values after every collision
+* At the end, collect all robots with health greater than `0`
+
+### Java
+
+* Store all indices in an Integer array
+* Sort the array using positions
+* Use Stack to store right-moving robots
+* For every left-moving robot, process collisions one by one
+* Keep reducing health after every collision
+* Return surviving robot healths
+
+### JavaScript
+
+* Build an array of indices
+* Sort them by positions
+* Use an array as stack
+* Push right-moving robots
+* Resolve collisions when left-moving robot appears
+* Store only remaining health values in answer
+
+### Python3
+
+* Create a sorted index list
+* Use a stack for right-moving robots
+* Process collisions while stack is not empty
+* Reduce health accordingly
+* Collect surviving robots in original order
+
+### Go
+
+* Create index slice
+* Sort it based on positions
+* Use slice as stack
+* Compare left-moving robot with latest right-moving robot
+* Continue collisions until one robot dies
+* Store final surviving healths
+
+## Examples
+
+```text
+Input:
+positions = [3,5,2,6]
+healths = [10,10,15,12]
+directions = "RLRL"
+
+Output:
+[14]
+```
+
+Explanation:
+
+```text
+Robot at position 3 and robot at position 5 collide.
+Both have same health, so both die.
+
+Robot at position 2 and robot at position 6 collide.
+Robot with health 15 survives and becomes 14.
+```
 
 ---
 
-These solutions provide efficient ways to handle robot collisions and collect the healths of surviving robots using different programming languages. Each solution follows a similar approach but adapts to the specific syntax and idioms of each language.
+```text
+Input:
+positions = [1,2,5,6]
+healths = [10,10,11,11]
+directions = "RLRL"
+
+Output:
+[]
+```
+
+Explanation:
+
+```text
+First collision removes both robots.
+Second collision also removes both robots.
+No robot survives.
+```
+
+## How to use / Run locally
+
+### C++
+
+```bash
+g++ solution.cpp -o solution
+./solution
+```
+
+### Java
+
+```bash
+javac Solution.java
+java Solution
+```
+
+### JavaScript
+
+```bash
+node solution.js
+```
+
+### Python3
+
+```bash
+python solution.py
+```
+
+### Go
+
+```bash
+go run solution.go
+```
+
+## Notes & Optimizations
+
+* Sorting is necessary because robots are not given in position order.
+* Stack helps process only meaningful collisions.
+* Every robot is pushed and popped at most once.
+* This makes the collision simulation efficient.
+* Brute force collision simulation would be too slow for `10^5` robots.
+
+## Author
+
+* [Md Aarzoo Islam](https://www.instagram.com/code.with.aarzoo/)
