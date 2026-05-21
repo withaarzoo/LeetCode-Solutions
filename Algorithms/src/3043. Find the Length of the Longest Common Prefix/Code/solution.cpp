@@ -1,61 +1,51 @@
-#include <bits/stdc++.h>
-using namespace std;
-
-class Solution
-{
+class Solution {
 public:
-    // Function to find the length of the longest common prefix between two arrays of integers
-    int longestCommonPrefix(vector<int> &arr1, vector<int> &arr2)
-    {
-        // Create an unordered map to store prefixes of numbers from arr1.
-        unordered_map<string, int> prefixMap;
+    int longestCommonPrefix(vector<int>& arr1, vector<int>& arr2) {
+        
+        // Hash set to store all prefixes from arr1
+        unordered_set<int> prefixes;
 
-        // Step 1: Build the prefix map for all numbers in arr1
-        // Iterate over each number in arr1
-        for (int num : arr1)
-        {
-            // Convert the number into a string to handle its digits
-            string strNum = to_string(num);
-            string prefix = ""; // Initialize an empty string to build the prefix
+        // Generate all prefixes from arr1
+        for (int num : arr1) {
 
-            // Iterate over each character (digit) of the stringified number
-            for (char ch : strNum)
-            {
-                // Append the current character (digit) to the prefix
-                prefix += ch;
+            int x = num;
 
-                // Insert the current prefix into the prefix map and increment its count
-                prefixMap[prefix]++;
+            // Keep removing last digit
+            while (x > 0) {
+
+                // Store current prefix
+                prefixes.insert(x);
+
+                // Remove last digit
+                x /= 10;
             }
         }
 
-        // Variable to keep track of the maximum length of common prefix found
-        int maxLength = 0;
+        int ans = 0;
 
-        // Step 2: Check for common prefixes in arr2
-        // Iterate over each number in arr2
-        for (int num : arr2)
-        {
-            // Convert the number into a string to handle its digits
-            string strNum = to_string(num);
-            string prefix = ""; // Initialize an empty string to build the prefix
+        // Check every number from arr2
+        for (int num : arr2) {
 
-            // Iterate over each character (digit) of the stringified number
-            for (char ch : strNum)
-            {
-                // Append the current character (digit) to the prefix
-                prefix += ch;
+            int x = num;
 
-                // Check if this prefix exists in the prefix map (i.e., it's a common prefix)
-                if (prefixMap.find(prefix) != prefixMap.end())
-                {
-                    // Update maxLength to the maximum length of the common prefix found so far
-                    maxLength = max(maxLength, static_cast<int>(prefix.length()));
+            // Keep shortening the number
+            while (x > 0) {
+
+                // If prefix exists in arr1 prefixes
+                if (prefixes.count(x)) {
+
+                    // Convert to string to get digit length
+                    ans = max(ans, (int)to_string(x).size());
+
+                    // No need to check smaller prefixes
+                    break;
                 }
+
+                // Remove last digit
+                x /= 10;
             }
         }
 
-        // Return the length of the longest common prefix found
-        return maxLength;
+        return ans;
     }
 };

@@ -1,43 +1,43 @@
 class Solution:
-    def longestCommonPrefix(self, arr1: list[int], arr2: list[int]) -> int:
-        # Dictionary to store prefixes from arr1 and their occurrences
-        prefix_map = {}
+    def longestCommonPrefix(self, arr1: List[int], arr2: List[int]) -> int:
+        
+        # Set to store all prefixes from arr1
+        prefixes = set()
 
-        # Step 1: Build the prefix map using arr1
-        # Loop through each number in arr1
+        # Generate prefixes from arr1
         for num in arr1:
-            # Convert the number to a string to easily extract prefixes
-            str_num = str(num)
-            # Initialize an empty prefix string
-            prefix = ""
-            
-            # Loop through each character in the string version of the number
-            for ch in str_num:
-                # Append the character to the prefix
-                prefix += ch
-                # Update the prefix count in the prefix_map
-                # If the prefix already exists, increment its count; otherwise, set it to 1
-                prefix_map[prefix] = prefix_map.get(prefix, 0) + 1
-        
-        # Variable to track the maximum length of a common prefix found
-        max_length = 0
 
-        # Step 2: Check for common prefixes in arr2
-        # Loop through each number in arr2
+            x = num
+
+            # Keep removing last digit
+            while x > 0:
+
+                # Store current prefix
+                prefixes.add(x)
+
+                # Remove last digit
+                x //= 10
+
+        ans = 0
+
+        # Process arr2
         for num in arr2:
-            # Convert the number to a string to extract prefixes
-            str_num = str(num)
-            # Initialize an empty prefix string for the current number in arr2
-            prefix = ""
-            
-            # Loop through each character in the string version of the number
-            for ch in str_num:
-                # Append the character to the prefix
-                prefix += ch
-                # If the prefix exists in prefix_map (i.e., it was found in arr1)
-                if prefix in prefix_map:
-                    # Update the maximum length of the common prefix found
-                    max_length = max(max_length, len(prefix))
-        
-        # Return the maximum length of the common prefix between arr1 and arr2
-        return max_length
+
+            x = num
+
+            # Try all prefixes
+            while x > 0:
+
+                # Prefix exists
+                if x in prefixes:
+
+                    # Update answer with digit length
+                    ans = max(ans, len(str(x)))
+
+                    # Stop because longer prefix already found
+                    break
+
+                # Remove last digit
+                x //= 10
+
+        return ans
