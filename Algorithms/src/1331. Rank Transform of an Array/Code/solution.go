@@ -1,31 +1,27 @@
-import "sort"
-
 func arrayRankTransform(arr []int) []int {
-    if len(arr) == 0 {
-        return []int{}
-    }
-    
-    // Step 1: Create a sorted copy of the array
-    sortedArr := make([]int, len(arr))
-    copy(sortedArr, arr)
-    sort.Ints(sortedArr)
-    
-    // Step 2: Create a map to assign ranks
-    rankMap := make(map[int]int)
-    rank := 1
-    
-    // Step 3: Assign ranks to sorted elements
-    for _, num := range sortedArr {
-        if _, exists := rankMap[num]; !exists {
-            rankMap[num] = rank
-            rank++
-        }
-    }
-    
-    // Step 4: Replace each element in the original array with its rank
-    for i, num := range arr {
-        arr[i] = rankMap[num]
-    }
-    
-    return arr
+	// Create a copy so the original order is preserved
+	sorted := append([]int(nil), arr...)
+
+	// Sort the copied array
+	sort.Ints(sorted)
+
+	// Store value -> rank
+	rank := make(map[int]int)
+	currentRank := 1
+
+	// Assign ranks only to unique values
+	for _, num := range sorted {
+		if _, exists := rank[num]; !exists {
+			rank[num] = currentRank
+			currentRank++
+		}
+	}
+
+	// Replace every element with its assigned rank
+	for i, num := range arr {
+		arr[i] = rank[num]
+	}
+
+	// Return the transformed array
+	return arr
 }

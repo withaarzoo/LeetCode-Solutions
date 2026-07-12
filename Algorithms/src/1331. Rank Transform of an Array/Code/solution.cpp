@@ -1,28 +1,34 @@
-class Solution {
+class Solution
+{
 public:
-    vector<int> arrayRankTransform(vector<int>& arr) {
-        if (arr.empty()) return {};
-        
-        // Step 1: Copy and sort the array
-        vector<int> sorted_arr = arr;
-        sort(sorted_arr.begin(), sorted_arr.end());
-        
-        // Step 2: Create a map to assign ranks
-        unordered_map<int, int> rank_map;
-        int rank = 1;
-        
-        // Step 3: Assign ranks to sorted elements
-        for (int num : sorted_arr) {
-            if (rank_map.find(num) == rank_map.end()) {
-                rank_map[num] = rank++;
+    vector<int> arrayRankTransform(vector<int> &arr)
+    {
+        // Create a copy so the original order remains unchanged
+        vector<int> sorted = arr;
+
+        // Sort the copied array
+        sort(sorted.begin(), sorted.end());
+
+        // Store each unique value with its rank
+        unordered_map<int, int> rank;
+        int currentRank = 1;
+
+        // Assign ranks only to unique values
+        for (int num : sorted)
+        {
+            if (!rank.count(num))
+            {
+                rank[num] = currentRank++;
             }
         }
-        
-        // Step 4: Replace each element in the original array with its rank
-        for (int i = 0; i < arr.size(); ++i) {
-            arr[i] = rank_map[arr[i]];
+
+        // Replace every element with its assigned rank
+        for (int &num : arr)
+        {
+            num = rank[num];
         }
-        
+
+        // Return the transformed array
         return arr;
     }
 };

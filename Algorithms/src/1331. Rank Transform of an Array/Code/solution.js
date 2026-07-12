@@ -3,27 +3,28 @@
  * @return {number[]}
  */
 var arrayRankTransform = function (arr) {
-  if (arr.length === 0) return [];
+  // Create a copy of the original array
+  const sorted = [...arr];
 
-  // Step 1: Create a sorted copy of the array
-  let sortedArr = [...arr];
-  sortedArr.sort((a, b) => a - b);
+  // Sort the copied array in increasing order
+  sorted.sort((a, b) => a - b);
 
-  // Step 2: Create a map to store the rank of each element
-  let rankMap = new Map();
-  let rank = 1;
+  // Store value -> rank
+  const rank = new Map();
+  let currentRank = 1;
 
-  // Step 3: Assign ranks to sorted elements
-  for (let num of sortedArr) {
-    if (!rankMap.has(num)) {
-      rankMap.set(num, rank++);
+  // Assign ranks only once for every unique value
+  for (const num of sorted) {
+    if (!rank.has(num)) {
+      rank.set(num, currentRank++);
     }
   }
 
-  // Step 4: Replace each element in the original array with its rank
+  // Replace every element with its rank
   for (let i = 0; i < arr.length; i++) {
-    arr[i] = rankMap.get(arr[i]);
+    arr[i] = rank.get(arr[i]);
   }
 
+  // Return the transformed array
   return arr;
 };

@@ -1,29 +1,28 @@
-import java.util.*;
-
 class Solution {
     public int[] arrayRankTransform(int[] arr) {
-        if (arr.length == 0) return new int[0];
-        
-        // Step 1: Create a sorted copy of the array
-        int[] sortedArr = arr.clone();
-        Arrays.sort(sortedArr);
-        
-        // Step 2: Create a map to store the rank of each element
-        Map<Integer, Integer> rankMap = new HashMap<>();
-        int rank = 1;
-        
-        // Step 3: Assign ranks to sorted elements
-        for (int num : sortedArr) {
-            if (!rankMap.containsKey(num)) {
-                rankMap.put(num, rank++);
+        // Create a copy of the original array
+        int[] sorted = arr.clone();
+
+        // Sort the copied array
+        Arrays.sort(sorted);
+
+        // Store each unique value and its rank
+        HashMap<Integer, Integer> rank = new HashMap<>();
+        int currentRank = 1;
+
+        // Assign ranks to unique values only
+        for (int num : sorted) {
+            if (!rank.containsKey(num)) {
+                rank.put(num, currentRank++);
             }
         }
-        
-        // Step 4: Replace each element in the original array with its rank
+
+        // Replace every element with its rank
         for (int i = 0; i < arr.length; i++) {
-            arr[i] = rankMap.get(arr[i]);
+            arr[i] = rank.get(arr[i]);
         }
-        
+
+        // Return the transformed array
         return arr;
     }
 }
