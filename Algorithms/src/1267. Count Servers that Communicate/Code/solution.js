@@ -2,30 +2,26 @@
  * @param {number[][]} grid
  * @return {number}
  */
-var countServers = function (grid) {
-  const rows = grid.length;
-  const cols = grid[0].length;
-  const rowCount = new Array(rows).fill(0);
-  const colCount = new Array(cols).fill(0);
-
-  // First pass: Count servers in each row and column
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      if (grid[i][j] === 1) {
-        rowCount[i]++;
-        colCount[j]++;
-      }
+var countServers = function(grid) {
+    let m = grid.length;
+    let n = grid[0].length;
+    let row = new Array(m).fill(0);
+    let col = new Array(n).fill(0);
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            if (grid[i][j] === 1) {
+                row[i]++;
+                col[j]++;
+            }
+        }
     }
-  }
-
-  // Second pass: Count communicable servers
-  let count = 0;
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      if (grid[i][j] === 1 && (rowCount[i] > 1 || colCount[j] > 1)) {
-        count++;
-      }
+    let ans = 0;
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            if (grid[i][j] === 1 && (row[i] > 1 || col[j] > 1)) {
+                ans++;
+            }
+        }
     }
-  }
-  return count;
+    return ans;
 };
